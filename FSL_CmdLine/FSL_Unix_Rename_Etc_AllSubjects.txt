@@ -1,0 +1,11 @@
+# Using command line to :
+# get subject ID with awk, using underscore to show field separators
+# print to the screen subject ID so I know it’s working on that subject
+# go into subject directories, split 4D image output,
+# convert NaNs to 0
+# mask (multiply) by the brain in MNI
+# copy the outputs to a new spot with subjectID names
+
+
+
+for dir in /data/jag/cnds/pilotDESMOND/resting/*.RestAroma/reg_standard/ListSG_YeoLPp_AmitBLA_GreicPostCing.fc/ ; do subID=`echo $dir | awk -F _ '{ print $1 }'` ; subID=`echo $subID | awk -F / '{ print $7 }'` ; echo $subID in progress… ; cd $dir ; fslsplit ListSG_YeoLPp_AmitBLA_GreicPostCing_connectivity_roi_z_mni.nii.gz ; fslmaths vol0000.nii.gz -nan -mul /share/apps/fsl/5.0.8/data/standard/MNI152_T1_2mm_brain_mask.nii.gz mni_LSGfc ; fslmaths vol0001.nii.gz -nan -mul /share/apps/fsl/5.0.8/data/standard/MNI152_T1_2mm_brain_mask.nii.gz mni_YeoLPpFC ; fslmaths vol0002.nii.gz -nan -mul /share/apps/fsl/5.0.8/data/standard/MNI152_T1_2mm_brain_mask.nii.gz mni_aBLAfc ; fslmaths vol0003.nii.gz -nan -mul /share/apps/fsl/5.0.8/data/standard/MNI152_T1_2mm_brain_mask.nii.gz mni_GrPostCingFC ; cp mni_LSGfc.nii.gz /tmp/cp2Taki/${subID}_mni_LSGfc.nii.gz ; echo finished $dir ; done
