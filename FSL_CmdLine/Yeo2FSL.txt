@@ -1,0 +1,3 @@
+convert Yeo or other networks from free surfer space to FSL 2mm
+
+http://psych.colorado.edu/~anre8906/guides/yeo_networks.html

@@ -1,0 +1,19 @@
+Make sphere ROI in FSL
+
+Find MNI conversion to voxel space in FSLview (Left column is voxel space; right column is MNI).
+
+1) Create point at voxelcoordinate location: (not in MNI but in voxel coordinates.  have to open MNI brain and get these in fslview.)
+
+fslmaths /share/apps/fsl/5.0.8/data/standard/MNI152_T1_2mm_brain.nii.gz -mul 0 -add 1 -roi 64 1 64 1 64 1 0 1 Max_SG_FullMNI -odt float
+
+fslmaths /usr/local/fsl/data/standard/MNI152_T1_2mm_brain.nii.gz -mul 0 -add 1 -roi 64 1 64 1 64 1 0 1 Max_SG_FullMNI -odt float
+
+[xyz and an extra ‘0 1’]
+
+2) Make a sphere around that point: also this is the radius size so if you want diameter size 15mm, radius would be 7.5.
+
+fslmaths Max_SG_FullMNI.nii.gz -kernel sphere 5 -fmean -bin SGatlas_5mmSphere -odt float
+
+If your sphere is >10mm radius, you have to add an extra threshold:
+
+fslmaths point_rIFG.nii.gz -kernel sphere 15 -fmean -thr .00001 -bin sphere_mask2
