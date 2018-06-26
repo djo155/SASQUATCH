@@ -1,5 +1,0 @@
-# For set of images use awk to get subject ID and site, then print to screen:
-# Subject ID, Stim Site and Non-Zero (-M) average value within the mask identified
-# after the letter ‘-k’
-
-for im in *_targets/Subject321_TMSfMRI_*.tmsER/reg_standard/tms_with_motion.spm/NoNaN_con0001_mni.nii.gz ; do f=$im ; subID=`echo ${f} | awk -F _ '{ print $2 }'`; subID=`echo ${subID} | awk -F / '{ print $2 }'` ; site=`echo ${f} | awk -F _ '{ print $4 }'` ; site=`echo ${site} | awk -F . '{ print $1 }'` ; echo $subID $site `fslstats $im -k /data/jag/cnds/deswork/ROIs/Liston_sgACCgm.nii.gz  -M` ; done
