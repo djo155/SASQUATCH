@@ -1,0 +1,72 @@
+function data = RL_alpha(rew,alpha,beta)
+%% FUNCTION TO GENERATE RESPONSES FROM A REINFORECMENT LEARNING MODEL
+% Function to model the behavior of a reinforcement learning agent with a
+% single alpha and beta learning parameter.
+%
+% Q-values are updated using a standrard Rescorla-Wagner updating rule:
+% Qt+1 = Qt + alpha*delta
+% Choices are selected using a standard softmax policy:
+% Pr(Choice) = exp(Qt(choice)/beta)/sum(exp(Qt(all choices)/beta)
+%
+% INPUT:
+%    - rew: Reward payout matrix for selecting either item on each trial
+%    - alpha: learning rate parameter (ranges between 0 and 1
+%    - beta: inverse temperature parameter reflecting choice variability -
+%    values tending towards 0 indicate random choices, values tending
+%    towards infinity indicate hard-max "greedy" options
+%
+% OUTPUT: structure "data" with following arrays
+%    - ParamNames: Parameter names
+%    - ParamValues: Values of the paramters used
+%    - QValues: Trial-by-trial Q-values for each option
+%    - Pchoices: Probability of selecting each option after softmax
+%    - Choices: Simulated choices
+%    - Delta: Trial-by-trial prediction error
+
+
+%% INITIALIZE ARRAYS
+ntrials = length(rew(:,1));  %Number of trials
+V = NaN(ntrials,2);          %Q-values at the start of each trial
+Vinit = [.5 .5];             %Initial Q-values
+Pchoice = NaN(ntrials,2);    %Probability of making each choice on each trial
+Choice = ones(ntrials,1);    %Stochastic choice made for a given simulation
+Delta = NaN(ntrials,1);      %Reward prediction error
+Reward = NaN(ntrials,1);      %Whether or not a reward was obtained
+
+%% RUN MODEL
+for i = 1:ntrials
+    % Initialize equal Q values on the first trial
+    if i == 1
+        V(i,:) = Vinit;
+    end
+    
+    % Get probability of making a choice given the current Q-values
+    Pchoice(i,:) = exp(beta.*V(i,:))./sum(exp(beta.*V(i,:)));
+ 
+    % Make choice - 1 for left 2 for right
+    if rand < Pchoice(i,2)
+        Choice(i) = 2;
+    end
+    
+    % Get reward prediction error (delta)
+    Reward(i) = rew(i,Choice(i));
+    Delta(i) = Reward(i)-V(i,Choice(i));
+    
+    %Update Q-value for the next trial
+    if i < ntrials
+        V(i+1,:) = V(i,:);
+        V(i+1,Choice(i)) = V(i,Choice(i))+(alpha*Delta(i));
+    end
+end
+
+%% SAVE ARRAYS
+data.ParamNames = {'Alpha','Beta'};
+data.ParamValues = [alpha,beta];
+data.QValues = V;
+data.Pchoice = Pchoice;
+data.Choices = Choice;
+data.Delta = Delta;
+data.rew = rew;
+data.Reward=Reward;
+end
+    
